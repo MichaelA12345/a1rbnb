@@ -1,4 +1,4 @@
-# `<name of application here>`
+# `<A1RBNB>`
 
 ## Database Schema Design
 
