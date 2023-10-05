@@ -76,7 +76,7 @@ const validateSpotImageCreation = [
 const validateSpotReviewCreation = [
     requireAuth,
     checkExists('Spot'),
-    checkExists('Review',options = {},method=checkReviewExists),
+    checkExists('Review',{},checkReviewExists),
     check('review')
       .exists({checkFalsy: true})
       .withMessage("Review text is required"),

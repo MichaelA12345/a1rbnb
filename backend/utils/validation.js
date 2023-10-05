@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator');
-const { Spot,Booking,SpotImage,Review,ReviewImage } = require('../db/models');
+const { Spot,Booking,SpotImage,Review,ReviewImage,sequelize } = require('../db/models');
 
 const selectedTable = {
   "Spot": {
@@ -13,8 +13,10 @@ const selectedTable = {
       o: 'userId'
   },
   "SpotImage": {
-      id: 'spotImageId',
-      t: SpotImage
+      id: 'imageId',
+      t: SpotImage,
+      o: 'ownerId',
+      p: 'imageId'
   },
   "Review": {
       id: 'spotId',
@@ -32,9 +34,12 @@ const checkExists = (table,options = {}, method=null)=>{
   return async function (req, res, next) {
     const idName = selectedTable[table].id;
     const existsDB = await selectedTable[table].t.findByPk(req.params[idName],options);
+   
     if (existsDB || method) {
-      req.tryOwner = existsDB[selectedTable[table].o]
+      req.tryOwner = existsDB[selectedTable[table].o] || Object.values(existsDB).pop()[selectedTable[table].o];
       req.tryUserId = existsDB[selectedTable[table].uid] || 0;
+      console.log(existsDB)
+      console.log(req.tryOwner)
       if(method) {
         const err = method(req.tryOwner,req.tryUserId);
         if (err) return next(err);
@@ -49,9 +54,11 @@ const checkExists = (table,options = {}, method=null)=>{
 }};
 
 
+
 const checkOwner = (table) =>{
  return function (req,res, next) {
  // const idName = selectedTable[table].id;
+ 
   if(req.tryOwner == req.user.id) return next();
   const err = new Error(`${table} must belong to the current user`);
   err.status = 403;

@@ -26,7 +26,15 @@ class Checker {
         this.table = table;
         this.options = options;
     }
-
+    
+    existsDB = (req,res,next) =>{
+        console.log('worksssssssssssssss')
+        this.table = '34'
+        return next();
+    }
+    test = () => {
+        console.log('wragainnnnnnn',this.table)
+    }
 
     async itemExists(req,res,next) {
         const selected = selectedTable[this.table];
@@ -40,6 +48,7 @@ class Checker {
         err.errors = { message: 'Spot couldn\'t be found' }
         return next(err);
     }
+    
 
     checkOwner(req, res, next) {
         if(req.tryOwner == req.user.id) return next();
@@ -50,7 +59,22 @@ class Checker {
     
 }
 
+const checkDB = () =>  {
+    existsDB = (req,res,next) =>{
+        console.log('worksssssssssssssss')
+        this.table = '34'
+        return next();
+    },
+    test = () => {
+        console.log('wragainnnnnnn',this.table)
+    }
+    msg = () => {
+        return {
+
+        }
+    }
+}
 
 module.exports = {
-    Checker
+    checkDB
 }
