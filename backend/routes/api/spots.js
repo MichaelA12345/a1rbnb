@@ -54,7 +54,8 @@ const validateSpotDeletion = [
     handleValidationErrors
 ];
 const validateSpotEdit = [
-    
+    checkExists('Spot'),
+    checkOwner('Spot'),
 ];
 const validateSpotImageCreation = [
     requireAuth,
@@ -70,6 +71,40 @@ const validateSpotImageCreation = [
       .withMessage('Enter true or false whether to show preview of image'),
     handleValidationErrors
 ];
+
+const validateSpotReviewCreation = [
+    requireAuth,
+    checkExists('Spot'),
+    checkOwner('Spot'),
+];
+
+
+router.get('/current', 
+requireAuth,
+async (req, res) => {
+    const {user} = req;
+    const userSpots = await Spot.scope({method: ["ratingAndPreview"]}).findAll({where: { ownerId: user.id}});
+    res.json(userSpots)
+}
+);
+router.get('/',
+async (req,res) => {
+    const spot = await Spot.scope({method: ["ratingAndPreview"]}).findAll();
+    res.json(spot)
+}
+);
+
+
+router.post('/:spotId/reviews',
+    validateSpotReviewCreation,
+    async (req,res) =>{
+        const {review,stars} = req.body;
+        const {user} = req;
+        const spotId = req.params.spotId;
+        const createdReview = await Review.create({userId:user.id,spotId:spotId,review:review,stars:stars});
+        res.json(createdReview)
+    }
+)
 router.post('/:spotId/images',
     validateSpotImageCreation,
     async (req, res) => {
@@ -85,33 +120,6 @@ router.post('/:spotId/images',
         res.json(safeSpotImage)  
     }
 );
-
-
-router.get('/',
-    async (req,res) => {
-        const spot = await Spot.findAll({
-            attributes: {
-               // where: [sequelize.where(sequelize.col('Spots.id'),sequelize.col('Reviews.spotId'))],
-                include: [
-                    [
-                        sequelize.fn('AVG', sequelize.col("Reviews.stars")),'avgRating'
-                    ],
-                    [sequelize.col("SpotImages.url"), 'previewImage']
-                ]
-            },
-            include: [{
-                model: Review,
-                attributes: []
-            },
-            {
-                model: SpotImage,
-                attributes: []
-            }]
-        })
-        res.json(spot)
-    }
-);
-
 router.post('/',
     validateSpotCreation,
     async (req,res) => {
@@ -127,7 +135,7 @@ router.post('/',
 
 );
 
-router.delete('/:spotId', 
+router.delete('/:spotId',
     validateSpotDeletion,
     async (req, res) => {
         await deleteItem("Spot", {where: {id: req.params.spotId}})
@@ -136,9 +144,13 @@ router.delete('/:spotId',
 
 
 router.put('/:spotId', 
+    validateSpotCreation,
     validateSpotEdit,
     async (req, res) => {
-
+        const {address,city,state,country,lat,lng,name,description,price} = req.body;
+        await Spot.update({address:address,city:city,state:state,country:country,lat:lat,lng:lng,name:name,description:description,price:price},{where: {id: req.params.spotId}});
+        const updatedSpot = await Spot.findByPk(req.params.spotId)
+        res.json(updatedSpot);
     }
 );
 

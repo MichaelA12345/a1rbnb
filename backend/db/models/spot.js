@@ -54,6 +54,27 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Spot',
+    scopes: {
+      ratingAndPreview(){
+        const { Review,SpotImage } = require('../models');
+        return {
+          include: [{model:Review,attributes:[]},{model:SpotImage,attributes:[]}],
+          group: ['Spot.id'],
+          attributes: {
+            include: [
+              [
+                sequelize.fn('AVG', sequelize.col("Reviews.stars")),'avgRating'
+              ],
+              [sequelize.col("SpotImages.url"), 'previewImage']
+            ]
+          }
+          
+        }
+      },
+      preview(){
+
+      }
+    }
   });
   return Spot;
 };
