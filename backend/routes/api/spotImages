@@ -1,0 +1,22 @@
+const express = require('express');
+const {  requireAuth } = require('../../utils/auth');
+const router = express.Router();
+
+const { SpotImage, sequelize } = require('../../db/models');
+
+const { deleteItem } = require('../../utils/management');
+const { handleValidationErrors, checkOwner, checkExists } = require('../../utils/validation');
+const validateSpotImageDeletion = [
+    requireAuth,
+    //(req,res,next)=>new Checker("Spot",{}).itemExists().checkOwner(),
+    checkExists('SpotImage'),
+    checkOwner('SpotImage'),
+    handleValidationErrors
+];
+router.delete('/:imageId',
+    validateSpotImageDeletion,
+    async (req, res) => {
+        await deleteItem("SpotImage", {where: {id: req.params.spotId}})
+    res.json({"message": "Successfully deleted"})
+});
+module.exports = router;

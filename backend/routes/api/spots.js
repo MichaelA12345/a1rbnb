@@ -4,7 +4,7 @@ const router = express.Router();
 const { Spot,Review,SpotImage, sequelize } = require('../../db/models');
 
 const { check } = require('express-validator');
-const { handleValidationErrors, checkOwner, checkExists } = require('../../utils/validation');
+const { handleValidationErrors, checkOwner, checkExists, checkReviewExists } = require('../../utils/validation');
 const { deleteItem } = require('../../utils/management');
 const { Checker } = require('../../utils/checker');
 
@@ -56,6 +56,7 @@ const validateSpotDeletion = [
 const validateSpotEdit = [
     checkExists('Spot'),
     checkOwner('Spot'),
+    handleValidationErrors
 ];
 const validateSpotImageCreation = [
     requireAuth,
@@ -75,7 +76,15 @@ const validateSpotImageCreation = [
 const validateSpotReviewCreation = [
     requireAuth,
     checkExists('Spot'),
-    checkOwner('Spot'),
+    checkExists('Review',options = {},method=checkReviewExists),
+    check('review')
+      .exists({checkFalsy: true})
+      .withMessage("Review text is required"),
+    check('stars')
+      .exists({ checkFalsy: true })
+      .isLength({ min: 1, max: 5 })
+      .withMessage("Stars must be an integer from 1 to 5"),
+    handleValidationErrors
 ];
 
 
@@ -101,7 +110,7 @@ router.post('/:spotId/reviews',
         const {review,stars} = req.body;
         const {user} = req;
         const spotId = req.params.spotId;
-        const createdReview = await Review.create({userId:user.id,spotId:spotId,review:review,stars:stars});
+        const createdReview = await Review.create({userId:user.id,spotId:parseInt(spotId),review:review,stars:stars});
         res.json(createdReview)
     }
 )
