@@ -179,15 +179,14 @@ router.get('/:spotId/reviews',
 router.get('/:spotId',
 checkExists("Spot"),
     async (req,res) =>{
-        const spotFull = await Spot.scope([{method: ["countReviews"]},{method: ["ratingAndPreview"]}]).findByPk(parseInt(req.params.spotId),{include:[{model:User}]});
+        const spotFull = await Spot.scope([{method: ["countReviews"]},{method: ["ratingAndPreview"]}]).findByPk(parseInt(req.params.spotId));
         const spotImages = await SpotImage.findAll({where: {spotId: req.params.spotId}})
         let s = spotFull.dataValues;
-        const usr = {id:s.User.id,firstName:s.User.firstName,lastName:s.User.lastName} 
+       // const usr = {id:s.User.id,firstName:s.User.firstName,lastName:s.User.lastName} 
         delete s.previewImage;
-        delete s.User
-        delete s.idk;
+        //delete s.User;
         s.SpotImages = spotImages;
-        s.Owner = usr
+      //  s.Owner = usr
 
         res.json(s)
     }
