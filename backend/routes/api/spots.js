@@ -127,7 +127,7 @@ validateSpotSearchFilters,
         const size = req.query.size === undefined || (1>req.query.size>20)? 20 : parseInt(req.query.size);
         const limit = size;
         const offset = size * (page-1);
-        const spot = await Spot.findAll({where: where,limit: limit,offset:offset,include:[{model:Review,attributes:{exclude:['createdAt','updatedAt','id','spotId','userId','review']}},{model:SpotImage,attributes:{exclude:['id','preview','createdAt','updatedAt','spotId']}}],attributes:{exclude:['createdAt','updatedAt']}});
+        const spot = await Spot.findAll({where: where,limit: limit,offset:offset,include:[{model:Review,attributes:{exclude:['createdAt','updatedAt','id','spotId','userId','review']}},{model:SpotImage,attributes:{exclude:['id','preview','createdAt','updatedAt','spotId']}}]});
         spot.forEach(s=>{
             let p = s.dataValues.SpotImages[0];
             let r = s.dataValues.Reviews[0];
@@ -272,8 +272,8 @@ router.put('/:spotId',
     async (req, res) => {
         const {address,city,state,country,lat,lng,name,description,price} = req.body;
         await Spot.update({address:address,city:city,state:state,country:country,lat:lat,lng:lng,name:name,description:description,price:price},{where: {id: req.params.spotId}});
-        const updatedSpot = await Spot.findByPk(req.params.spotId).dataValues
-        res.json(updatedSpot);
+        const updatedSpot = await Spot.findByPk(req.params.spotId)
+        res.json(updatedSpot.dataValues);
     }
 );
 

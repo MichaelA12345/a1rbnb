@@ -42,7 +42,7 @@ router.get('/current',
         }
         
         //delete bookings[0].Spot.dataValues.SpotImages
-        res.json(bookings)
+        res.json({"Bookings":bookings})
     }
 );
 

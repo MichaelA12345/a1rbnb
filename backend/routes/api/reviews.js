@@ -44,7 +44,8 @@ router.get('/current',
         let reviews = await Review.findAll({where:{userId:user.id},include:[{model:User,attributes:{exclude:['username','email','hashedPassword','createdAt','updatedAt']}},{model:Spot,attributes:{exclude:['createdAt','updatedAt']}},{model:ReviewImage,attributes:{exclude:['createdAt','updatedAt','reviewId']}}]});
         reviews.forEach(r=>{
             console.log(r.ReviewImages[0])
-            if(r.ReviewImages[0])r.Spot.dataValues.previewImage = r.ReviewImages[0].dataValues.url
+            if(r.ReviewImages[0])r.Spot.dataValues.previewImage = r.ReviewImages[0].dataValues.url;
+            delete r.Spot.dataValues
         })
         res.json({'Reviews':reviews})
     }

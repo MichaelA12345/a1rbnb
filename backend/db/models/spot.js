@@ -65,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
               [
                 sequelize.fn('AVG', sequelize.col("Reviews.stars")),'avgRating'
               ],
-              [sequelize.col("SpotImages.url"), 'previewImage']
+              [sequelize.col("url"), 'previewImage']
             ]
           }
           
