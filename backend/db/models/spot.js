@@ -71,9 +71,20 @@ module.exports = (sequelize, DataTypes) => {
           
         }
       },
-      preview(){
-
+      countReviews(){
+        const { Review,SpotImage } = require('../models');
+        return {
+          include: [{model:Review,attributes:[]}],
+          attributes: {
+            include: [
+              [
+                sequelize.fn('COUNT', sequelize.col("Reviews.id")),'numReviews'
+              ]
+            ]
+          }
+        }
       }
+      
     }
   });
   return Spot;

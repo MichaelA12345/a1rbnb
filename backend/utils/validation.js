@@ -19,7 +19,7 @@ const selectedTable = {
       p: 'imageId'
   },
   "Review": {
-      id: 'spotId',
+      id: 'reviewId',
       t: Review,
       o: 'userId',
       uid: 'userId'
@@ -30,16 +30,15 @@ const selectedTable = {
   }
 }
 
-const checkExists = (table,options = {}, method=null)=>{
+const checkExists = (table,options = {}, method=null,idName=undefined)=>{
   return async function (req, res, next) {
-    const idName = selectedTable[table].id;
+    if (!idName)  idName = selectedTable[table].id;
     const existsDB = await selectedTable[table].t.findByPk(req.params[idName],options);
-   
+   console.log(existsDB)
     if (existsDB || method) {
       req.tryOwner = existsDB[selectedTable[table].o] || Object.values(existsDB).pop()[selectedTable[table].o];
       req.tryUserId = existsDB[selectedTable[table].uid] || 0;
-      console.log(existsDB)
-      console.log(req.tryOwner)
+      console.log(req.tryOwner,req.tryUserId,table)
       if(method) {
         const err = method(req.tryOwner,req.tryUserId);
         if (err) return next(err);
@@ -65,12 +64,22 @@ const checkOwner = (table) =>{
   return next(err)
 }};
 
-const checkReviewExists = (tryUser, user)=>{
-  if(tryUser == user) {
+const checkReviewExists = async (req,res,next)=>{
+  const {user} = req;
+  const review = await Review.findOne({where: {spotId:req.params.spotId,userId:user.id}})
+  if(review) {
     const err = new Error("User already has a review for this spot")
     err.status = 403;
-    return err;
-  }
+    return next(err);
+  } return next();
+} 
+const checkMaxReviewImages = async (req,res,next)=>{
+  const review = await ReviewImage.count({where: {reviewId:req.params.reviewId}})
+  if(review>=10) {
+    const err = new Error("Maximum number of images for this resource was reached")
+    err.status = 403;
+    return next(err);
+  } return next();
 } 
 // middleware for formatting errors from express-validator middleware
 // (to customize, see express-validator's documentation)
@@ -96,5 +105,6 @@ module.exports = {
   handleValidationErrors,
   checkOwner,
   checkExists,
-  checkReviewExists
+  checkReviewExists,
+  checkMaxReviewImages
 };

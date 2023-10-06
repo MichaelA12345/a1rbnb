@@ -1,7 +1,7 @@
 const express = require('express');
 const {  requireAuth } = require('../../utils/auth');
 const router = express.Router();
-const { Spot,Review,SpotImage, sequelize } = require('../../db/models');
+const { User,Spot,Review,SpotImage,ReviewImage, sequelize } = require('../../db/models');
 
 const { check } = require('express-validator');
 const { handleValidationErrors, checkOwner, checkExists, checkReviewExists } = require('../../utils/validation');
@@ -76,7 +76,7 @@ const validateSpotImageCreation = [
 const validateSpotReviewCreation = [
     requireAuth,
     checkExists('Spot'),
-    checkExists('Review',{},checkReviewExists),
+    checkReviewExists,
     check('review')
       .exists({checkFalsy: true})
       .withMessage("Review text is required"),
@@ -87,20 +87,43 @@ const validateSpotReviewCreation = [
     handleValidationErrors
 ];
 
-
 router.get('/current', 
-requireAuth,
-async (req, res) => {
-    const {user} = req;
-    const userSpots = await Spot.scope({method: ["ratingAndPreview"]}).findAll({where: { ownerId: user.id}});
-    res.json(userSpots)
-}
-);
+    requireAuth,
+    async (req, res) => {
+        const {user} = req;
+        const userSpots = await Spot.scope({method: ["ratingAndPreview"]}).findAll({where: { ownerId: user.id}});
+        res.json(userSpots)
+    }
+ );
 router.get('/',
-async (req,res) => {
-    const spot = await Spot.scope({method: ["ratingAndPreview"]}).findAll();
-    res.json(spot)
-}
+    async (req,res) => {
+        const spot = await Spot.scope({method: ["ratingAndPreview"]}).findAll();
+        res.json(spot)
+    }
+);
+router.get('/:spotId/reviews',
+    checkExists("Spot"),
+    async (req,res) => {
+        const spotsByReview = await Review.findAll({where:{spotId:req.params.spotId},include:[{model:User,attributes:{exclude:['username','email','hashedPassword','createdAt','updatedAt']}},{model:ReviewImage,attributes:{exclude:['createdAt','updatedAt','reviewId']}}]})
+        res.json({Reviews:spotsByReview})
+    }
+);
+router.get('/:spotId',
+    async (req,res) =>{
+        const spotFull = await Spot.scope([{method: ["countReviews"]},{method: ["ratingAndPreview"]}]).findByPk(parseInt(req.params.spotId),{include:[{model:User}]});
+        const spotImages = await SpotImage.findAll({where: {spotId: req.params.spotId}})
+        let s = spotFull.dataValues
+        //  let spot = {
+        //     id:s.id,ownerId:s.ownerId,address:s.address,city:s.city,state:s.state,country:s.country,lat:s.lat,lng:s.lng,name:s.name,description:s.description,price:s.price,createdAt:s.createdAt,updatedAt:s.updatedAt,avgRating:s.avgRating,numReviews:s.numRatings
+        //  }
+        const usr = {id:s.User.id,firstName:s.User.firstName,lastName:s.User.lastName} 
+        delete s.previewImage;
+        delete s.User
+        s.SpotImages = spotImages;
+        s.Owner = usr
+
+        res.json(s)
+    }
 );
 
 
