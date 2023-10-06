@@ -22,6 +22,18 @@ module.exports = {
         name: 'space',
         description: 'great nice',
         price: 5.0,
+      },
+      {
+        ownerId: 1,
+        address: '45 34th TEST St',
+        city: 'Los Angeles',
+        state: 'CA',
+        country: 'US',
+        lat: 35,
+        lng: 35,
+        name: 'Added test seeder',
+        description: 'great nice',
+        price: 75.0,
       }
     ], { validate: false });
   },

@@ -53,7 +53,7 @@ router.put('/:bookingId',
         const {bookingId} = req.params;
         startDate = new Date(startDate);
         endDate = new Date(endDate);
-        if(endDate<startDate){
+        if(endDate<=startDate){
             res.statusCode = 400;
         return res.json({"message":"endDate cannot come before startDate"})
         }

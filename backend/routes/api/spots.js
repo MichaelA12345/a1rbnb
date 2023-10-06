@@ -204,7 +204,7 @@ router.post('/:spotId/bookings',
         const {startDate,endDate} = req.body;
         const {user} = req;
         const {spotId} = req.params;
-        if(endDate<startDate){
+        if(endDate<=startDate){
             res.statusCode = 400;
         return res.json({"message":"endDate cannot come before startDate"})
         }
