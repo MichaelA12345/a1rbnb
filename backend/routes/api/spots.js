@@ -184,7 +184,8 @@ checkExists("Spot"),
         let s = spotFull.dataValues;
         const usr = {id:s.User.id,firstName:s.User.firstName,lastName:s.User.lastName} 
         delete s.previewImage;
-        delete s.User;
+        delete s.User
+        delete s.idk;
         s.SpotImages = spotImages;
         s.Owner = usr
 
