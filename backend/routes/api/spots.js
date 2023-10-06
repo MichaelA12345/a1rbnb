@@ -186,6 +186,11 @@ checkExists("Spot"),
         delete s.previewImage;
         delete s.User
         delete s.idk;
+        s.lat = parseFloat(s.lat);
+        s.lng = parseFloat(s.lng)
+        s.price = parseFloat(s.price);
+        s.numReviews = parseInt(s.numReviews);
+        s.avgRating = parseFloat(s.avgRating);
         s.SpotImages = spotImages;
         s.Owner = usr
 
