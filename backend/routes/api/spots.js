@@ -179,7 +179,7 @@ router.get('/:spotId/reviews',
 router.get('/:spotId',
 checkExists("Spot"),
     async (req,res) =>{
-        const spotFull = await Spot.scope([{method: ["countReviews"]},{method: ["ratingAndPreview"]}]).findByPk(parseInt(req.params.spotId),{include:[{model:User}]});
+        const spotFull = await Spot.scope([{method: ["countReviews"]},{method: ["ratingAndPreview"]}]).findByPk(parseInt(req.params.spotId),{include:[{model:User,attributes:{include:[[sequelize.fn('count', sequelize.col('User.id')),'idk']]}}]});
         const spotImages = await SpotImage.findAll({where: {spotId: req.params.spotId}})
         let s = spotFull.dataValues;
         const usr = {id:s.User.id,firstName:s.User.firstName,lastName:s.User.lastName} 
