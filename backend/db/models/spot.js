@@ -84,6 +84,7 @@ module.exports = (sequelize, DataTypes) => {
         const { Review,SpotImage } = require('../models');
         return {
           include: [{model:Review,attributes:[]}],
+          group: ['Reviews.spotId'],
           attributes: {
             include: [
               [
