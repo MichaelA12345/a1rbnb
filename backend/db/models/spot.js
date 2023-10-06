@@ -89,7 +89,8 @@ module.exports = (sequelize, DataTypes) => {
             include: [
               [
                 sequelize.fn('COUNT', sequelize.col("Reviews.id")),'numReviews'
-              ]
+              ],
+              [sequelize.fn('count', sequelize.col('User.id')),'idk']
             ]
           }
         }
