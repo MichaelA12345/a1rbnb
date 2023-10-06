@@ -71,6 +71,15 @@ module.exports = (sequelize, DataTypes) => {
           
         }
       },
+      preview(){
+        const {SpotImage} = require('../models');
+        return {
+          include: [{model:SpotImage,attributes:[]}],
+          attributes: {
+            include: [[sequelize.col("SpotImages.url"), 'previewImage']]
+          }
+        }
+      },
       countReviews(){
         const { Review,SpotImage } = require('../models');
         return {

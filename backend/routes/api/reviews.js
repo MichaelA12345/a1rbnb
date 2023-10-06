@@ -26,7 +26,7 @@ const validateReviewEdit = [
       .withMessage("Review text is required"),
     check('stars')
       .exists({ checkFalsy: true })
-      .isLength({ min: 1, max: 5 })
+      .isInt({ min: 1, max: 5 })
       .withMessage("Stars must be an integer from 1 to 5"),
     handleValidationErrors
 ];
@@ -43,9 +43,10 @@ router.get('/current',
         const {user} = req;
         let reviews = await Review.findAll({where:{userId:user.id},include:[{model:User,attributes:{exclude:['username','email','hashedPassword','createdAt','updatedAt']}},{model:Spot,attributes:{exclude:['createdAt','updatedAt']}},{model:ReviewImage,attributes:{exclude:['createdAt','updatedAt','reviewId']}}]});
         reviews.forEach(r=>{
-            r.Spot.dataValues.previewImage = r.ReviewImages[0].dataValues.url
+            console.log(r.ReviewImages[0])
+            if(r.ReviewImages[0])r.Spot.dataValues.previewImage = r.ReviewImages[0].dataValues.url
         })
-        res.json(reviews)
+        res.json({'Reviews':reviews})
     }
 );
 

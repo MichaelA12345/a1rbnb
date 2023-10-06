@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const { Spot,Booking,SpotImage,Review,ReviewImage,sequelize } = require('../db/models');
-
+const { Op } = require('sequelize');
 const selectedTable = {
   "Spot": {
       id: 'spotId',
@@ -10,7 +10,8 @@ const selectedTable = {
   "Booking": {
       id: 'bookingId',
       t: Booking,
-      o: 'userId'
+      o: 'userId',
+      uid: 'ownerId'
   },
   "SpotImage": {
       id: 'imageId',
@@ -25,8 +26,9 @@ const selectedTable = {
       uid: 'userId'
   },
   "ReviewImage": {
-      id: 'reviewImageId',
-      t: ReviewImage
+      id: 'imageId',
+      t: ReviewImage,
+      o: 'userId'
   }
 }
 
@@ -54,7 +56,7 @@ const checkExists = (table,options = {}, method=null,idName=undefined)=>{
 
 
 
-const checkOwner = (table) =>{
+const checkOwner = (table,coOwners = undefined) =>{
  return function (req,res, next) {
  // const idName = selectedTable[table].id;
  
@@ -64,6 +66,12 @@ const checkOwner = (table) =>{
   return next(err)
 }};
 
+const checkBookingOwner = (req,res,next) => {
+  if(req.tryOwner == req.user.id || req.tryUserId == req.user.id) return next();
+  const err = new Error(" Booking must belong to the current user or the Spot must belong to the current user")
+  err.status = 403;
+  return next(err);
+}
 const checkReviewExists = async (req,res,next)=>{
   const {user} = req;
   const review = await Review.findOne({where: {spotId:req.params.spotId,userId:user.id}})
@@ -80,7 +88,8 @@ const checkMaxReviewImages = async (req,res,next)=>{
     err.status = 403;
     return next(err);
   } return next();
-} 
+};
+
 // middleware for formatting errors from express-validator middleware
 // (to customize, see express-validator's documentation)
 const handleValidationErrors = (req, _res, next) => {
@@ -106,5 +115,7 @@ module.exports = {
   checkOwner,
   checkExists,
   checkReviewExists,
-  checkMaxReviewImages
+  checkMaxReviewImages,
+  checkBookingOwner,
+
 };
