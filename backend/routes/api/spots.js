@@ -108,6 +108,11 @@ router.get('/current',
     async (req, res) => {
         const {user} = req;
         const userSpots = await Spot.scope({method: ["ratingAndPreview"]}).findAll({where: { ownerId: user.id}});
+        userSpots.forEach(s=>{
+            s.dataValues.lat = parseFloat(s.dataValues.lat);
+            s.dataValues.lng = parseFloat(s.dataValues.lng);
+            s.dataValues.price = parseFloat(s.dataValues.price)
+        })
         res.json({"Spots":userSpots})
     }
  );
@@ -262,6 +267,9 @@ router.post('/',
 
         const spot = await Spot.create({ownerId,address,city,state,country,lat,lng,name,description,price})
         const spotFull = await Spot.findByPk(spot.id)
+        spotFull.dataValues.lat = parseFloat(spotFull.dataValues.lat);
+        spotFull.dataValues.lng = parseFloat(spotFull.dataValues.lng);
+        spotFull.dataValues.price = parseFloat(spotFull.dataValues.price)
         res.json(spotFull)
     }
 
