@@ -38,7 +38,9 @@ router.get('/current',
             if(b.Spot.SpotImages.length)b.Spot.dataValues['previewImage'] = b.Spot.SpotImages[0]['url'];
             console.log(b.Spot['previewImage'] )
             delete b.Spot.dataValues.SpotImages;
-          
+            b.Spot.dataValues.lat = parseFloat(b.Spot.dataValues.lat);
+            b.Spot.dataValues.lng = parseFloat(b.Spot.dataValues.lng);
+            b.Spot.dataValues.price = parseFloat(b.Spot.dataValues.price)
         }
         
         //delete bookings[0].Spot.dataValues.SpotImages
