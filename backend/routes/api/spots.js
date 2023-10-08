@@ -112,6 +112,7 @@ router.get('/current',
             s.dataValues.lat = parseFloat(s.dataValues.lat);
             s.dataValues.lng = parseFloat(s.dataValues.lng);
             s.dataValues.price = parseFloat(s.dataValues.price)
+            
         })
         res.json({"Spots":userSpots})
     }
@@ -136,7 +137,9 @@ validateSpotSearchFilters,
         spot.forEach(s=>{
             s.dataValues.lat = parseFloat(s.dataValues.lat)
             s.dataValues.lng = parseFloat(s.dataValues.lng)
-            s.dataValues.price = parseFloat(s.dataValues.price)
+            s.dataValues.price = parseFloat(s.dataValues.price);
+            s.dataValues.createdAt = s.dataValues.createdAt.toISOString().slice(0,10)
+            s.dataValues.updatedAt = s.dataValues.updatedAt.toISOString().slice(0,10)
             let p = s.dataValues.SpotImages[0];
             let r = s.dataValues.Reviews[0];
             if (r){
