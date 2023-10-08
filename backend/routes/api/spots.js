@@ -129,6 +129,9 @@ validateSpotSearchFilters,
         const offset = size * (page-1);
         const spot = await Spot.findAll({where: where,limit: limit,offset:offset,include:[{model:Review,attributes:{exclude:['createdAt','updatedAt','id','spotId','userId','review']}},{model:SpotImage,attributes:{exclude:['id','preview','createdAt','updatedAt','spotId']}}]});
         spot.forEach(s=>{
+            s.dataValues.lat = parseFloat(s.dataValues.lat)
+            s.dataValues.lng = parseFloat(s.dataValues.lng)
+            s.dataValues.price = parseFloat(s.dataValues.price)
             let p = s.dataValues.SpotImages[0];
             let r = s.dataValues.Reviews[0];
             if (r){
