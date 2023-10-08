@@ -45,7 +45,9 @@ router.get('/current',
         reviews.forEach(r=>{
             console.log(r.ReviewImages[0])
             if(r.ReviewImages[0])r.Spot.dataValues.previewImage = r.ReviewImages[0].dataValues.url;
-            delete r.Spot.dataValues
+            r.Spot.dataValues.lat = parseFloat(r.Spot.dataValues.lat);
+            r.Spot.dataValues.lng = parseFloat(r.Spot.dataValues.lng);
+            r.Spot.dataValues.price = parseFloat(r.Spot.dataValues.price)
         })
         res.json({'Reviews':reviews})
     }

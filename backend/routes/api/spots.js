@@ -290,6 +290,9 @@ router.put('/:spotId',
         const {address,city,state,country,lat,lng,name,description,price} = req.body;
         await Spot.update({address:address,city:city,state:state,country:country,lat:lat,lng:lng,name:name,description:description,price:price},{where: {id: req.params.spotId}});
         const updatedSpot = await Spot.findByPk(req.params.spotId)
+        updatedSpot.dataValues.lat = parseFloat(updatedSpot.dataValues.lat);
+        updatedSpot.dataValues.lng = parseFloat(updatedSpot.dataValues.lng);
+        updatedSpot.dataValues.price = parseFloat(updatedSpot.dataValues.price)
         res.json(updatedSpot.dataValues);
     }
 );
