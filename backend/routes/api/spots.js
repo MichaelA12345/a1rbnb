@@ -179,8 +179,8 @@ router.get('/:spotId/bookings',
             delete i.Spot.dataValues
             i.dataValues.startDate = i.dataValues.startDate.toISOString().slice(0,10)
             i.dataValues.endDate = i.dataValues.endDate.toISOString().slice(0,10)
-            i.dataValues.createdAt = i.dataValues.createdAt.toISOString().slice(0,10) + " " + i.dataValues.createdAt.toLocaleTimeString('it-IT')
-            i.dataValues.updatedAt = i.dataValues.updatedAt.toISOString().slice(0,10) + " " + i.dataValues.updatedAt.toLocaleTimeString('it-IT')
+          //  i.dataValues.createdAt = i.dataValues.createdAt.toISOString().slice(0,10) + " " + i.dataValues.createdAt.toLocaleTimeString('it-IT')
+           // i.dataValues.updatedAt = i.dataValues.updatedAt.toISOString().slice(0,10) + " " + i.dataValues.updatedAt.toLocaleTimeString('it-IT')
         })
         
         res.json({Bookings: spotBookings})
