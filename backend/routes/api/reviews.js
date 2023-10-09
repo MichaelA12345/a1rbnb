@@ -48,6 +48,8 @@ router.get('/current',
             r.Spot.dataValues.lat = parseFloat(r.Spot.dataValues.lat);
             r.Spot.dataValues.lng = parseFloat(r.Spot.dataValues.lng);
             r.Spot.dataValues.price = parseFloat(r.Spot.dataValues.price)
+            r.dataValues.createdAt = r.dataValues.createdAt.toISOString().slice(0,10)
+            r.dataValues.updatedAt = r.dataValues.updatedAt.toISOString().slice(0,10)
         })
         res.json({'Reviews':reviews})
     }
@@ -73,6 +75,8 @@ router.put('/:reviewId',
         const {review,stars} = req.body;
         await Review.update({review:review,stars:stars},{where: {id: req.params.reviewId}})
         const updatedReview = await Review.findByPk(req.params.reviewId);
+        updatedReview.dataValues.createdAt = updatedReview.dataValues.createdAt.toISOString().slice(0,10)
+        updatedReview.dataValues.updatedAt = updatedReview.dataValues.updatedAt.toISOString().slice(0,10)
         res.json(updatedReview)
     }  
 );

@@ -112,6 +112,8 @@ router.get('/current',
             s.dataValues.lat = parseFloat(s.dataValues.lat);
             s.dataValues.lng = parseFloat(s.dataValues.lng);
             s.dataValues.price = parseFloat(s.dataValues.price)
+            s.dataValues.createdAt = s.dataValues.createdAt.toISOString().slice(0,10)
+            s.dataValues.updatedAt = s.dataValues.updatedAt.toISOString().slice(0,10)
             
         })
         res.json({"Spots":userSpots})
@@ -175,6 +177,10 @@ router.get('/:spotId/bookings',
             }
             delete i.User.dataValues.username
             delete i.Spot.dataValues
+            i.dataValues.startDate = i.dataValues.startDate.toISOString().slice(0,10)
+            i.dataValues.endDate = i.dataValues.endDate.toISOString().slice(0,10)
+            i.dataValues.createdAt = i.dataValues.createdAt.toISOString().slice(0,10) + " " + i.dataValues.createdAt.toLocaleTimeString('it-IT')
+            i.dataValues.updatedAt = i.dataValues.updatedAt.toISOString().slice(0,10) + " " + i.dataValues.updatedAt.toLocaleTimeString('it-IT')
         })
         
         res.json({Bookings: spotBookings})
@@ -184,6 +190,10 @@ router.get('/:spotId/reviews',
     checkExists("Spot"),
     async (req,res) => {
         const spotsByReview = await Review.findAll({where:{spotId:req.params.spotId},include:[{model:User,attributes:{exclude:['username','email','hashedPassword','createdAt','updatedAt']}},{model:ReviewImage,attributes:{exclude:['createdAt','updatedAt','reviewId']}}]})
+        spotsByReview.forEach(r=>{
+            r.dataValues.createdAt = r.dataValues.createdAt.toISOString().slice(0,10)
+            r.dataValues.updatedAt = r.dataValues.updatedAt.toISOString().slice(0,10)
+        })
         res.json({Reviews:spotsByReview})
     }
 );
@@ -203,6 +213,8 @@ checkExists("Spot"),
         s.numReviews = parseInt(s.numReviews);
         s.avgRating = parseFloat(s.avgRating);
         s.SpotImages = spotImages;
+        s.createdAt = s.createdAt.toISOString().slice(0,10)
+        s.updatedAt = s.updatedAt.toISOString().slice(0,10)
         s.Owner = usr
 
         res.json(s)
@@ -224,7 +236,7 @@ router.post('/:spotId/bookings',
             res.statusCode = 403;
         return res.json({"message":"Spot must NOT belong to the current user"})
         }
-        const bookingConflict = await Booking.findOne({where:{spotId:req.params.spotId,[Op.or]:[{startDate:{[Op.between]:[startDate,endDate]}},{endDate:{[Op.between]:[startDate,endDate]}}]}})
+        const bookingConflict = await Booking.findOne({where:{spotId:req.params.spotId,[Op.or]:[{startDate:{[Op.between]:[startDate,endDate]}},{endDate:{[Op.between]:[startDate,endDate]}},{[Op.and]:[{startDate:{[Op.lte]: new Date(startDate)}},{endDate:{[Op.gte]: new Date(endDate) }}]},{endDate:{[Op.eq]: new Date(startDate)}}]}})
         console.log(bookingConflict)
         if(bookingConflict) {
         res.statusCode = 403;
@@ -232,6 +244,10 @@ router.post('/:spotId/bookings',
       }
 
         const newBooking = await Booking.create({spotId:spotId,userId:user.id,startDate:startDate,endDate:endDate});
+        newBooking.dataValues.createdAt = newBooking.dataValues.createdAt.toISOString().slice(0,10)
+        newBooking.dataValues.updatedAt = newBooking.dataValues.updatedAt.toISOString().slice(0,10)
+        newBooking.dataValues.startDate = newBooking.dataValues.startDate.toISOString().slice(0,10)
+        newBooking.dataValues.endDate = newBooking.dataValues.endDate.toISOString().slice(0,10)
         res.json(newBooking)
     }
 );
@@ -242,6 +258,8 @@ router.post('/:spotId/reviews',
         const {user} = req;
         const spotId = req.params.spotId;
         const createdReview = await Review.create({userId:user.id,spotId:parseInt(spotId),review:review,stars:stars});
+        createdReview.dataValues.createdAt = createdReview.dataValues.createdAt.toISOString().slice(0,10)
+        createdReview.dataValues.updatedAt = createdReview.dataValues.updatedAt.toISOString().slice(0,10)
         res.json(createdReview)
     }
 )
@@ -273,6 +291,8 @@ router.post('/',
         spotFull.dataValues.lat = parseFloat(spotFull.dataValues.lat);
         spotFull.dataValues.lng = parseFloat(spotFull.dataValues.lng);
         spotFull.dataValues.price = parseFloat(spotFull.dataValues.price)
+        spotFull.dataValues.createdAt = spotFull.dataValues.createdAt.toISOString().slice(0,10)
+        spotFull.dataValues.updatedAt = spotFull.dataValues.updatedAt.toISOString().slice(0,10)
         res.json(spotFull)
     }
 
@@ -296,6 +316,8 @@ router.put('/:spotId',
         updatedSpot.dataValues.lat = parseFloat(updatedSpot.dataValues.lat);
         updatedSpot.dataValues.lng = parseFloat(updatedSpot.dataValues.lng);
         updatedSpot.dataValues.price = parseFloat(updatedSpot.dataValues.price)
+        updatedSpot.dataValues.createdAt = updatedSpot.dataValues.createdAt.toISOString().slice(0,10)
+        updatedSpot.dataValues.updatedAt = updatedSpot.dataValues.updatedAt.toISOString().slice(0,10)
         res.json(updatedSpot.dataValues);
     }
 );

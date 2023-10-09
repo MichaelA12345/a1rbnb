@@ -41,6 +41,10 @@ router.get('/current',
             b.Spot.dataValues.lat = parseFloat(b.Spot.dataValues.lat);
             b.Spot.dataValues.lng = parseFloat(b.Spot.dataValues.lng);
             b.Spot.dataValues.price = parseFloat(b.Spot.dataValues.price)
+            b.dataValues.createdAt = b.dataValues.createdAt.toISOString().slice(0,10)
+            b.dataValues.updatedAt = b.dataValues.updatedAt.toISOString().slice(0,10)
+            b.dataValues.startDate = b.dataValues.startDate.toISOString().slice(0,10)
+            b.dataValues.endDate = b.dataValues.endDate.toISOString().slice(0,10)
         }
         
         //delete bookings[0].Spot.dataValues.SpotImages
@@ -64,7 +68,7 @@ router.put('/:bookingId',
             res.statusCode = 403;
         return res.json({"message":"Past bookings can\'t be modified"})
         }
-        const bookingConflict = await Booking.findOne({where:{spotId:updatedBooking.spotId,[Op.or]:[{startDate:{[Op.between]:[startDate,endDate]}},{endDate:{[Op.between]:[startDate,endDate]}}]}})
+        const bookingConflict = await Booking.findOne({where:{spotId:updatedBooking.spotId,[Op.or]:[{startDate:{[Op.between]:[startDate,endDate]}},{endDate:{[Op.between]:[startDate,endDate]}},{[Op.and]:[{startDate:{[Op.lte]: new Date(startDate)}},{endDate:{[Op.gte]: new Date(endDate) }}]},{endDate:{[Op.eq]: new Date(startDate)}}]}})
         console.log(bookingConflict)
         if(bookingConflict) {
         res.statusCode = 403;
@@ -72,6 +76,10 @@ router.put('/:bookingId',
       }
         await Booking.update({startDate:startDate,endDate:endDate},{where:{id:bookingId}})
         const update = await Booking.findByPk(bookingId);
+        update.dataValues.createdAt = update.dataValues.createdAt.toISOString().slice(0,10)
+        update.dataValues.updatedAt = update.dataValues.updatedAt.toISOString().slice(0,10)
+        update.dataValues.startDate = update.dataValues.startDate.toISOString().slice(0,10)
+        update.dataValues.endDate = update.dataValues.endDate.toISOString().slice(0,10)
         res.json(update)
     }
 );
