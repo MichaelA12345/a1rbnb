@@ -156,7 +156,8 @@ validateSpotSearchFilters,
             delete s.dataValues.SpotImages;
         });
         const theSpots = {"Spots":spot,page:page,size:size}
-        res.json(theSpots)
+        console.log(req.ip)
+        res.json({theSpots,"Hellooo":req.ip})
     }
 );
 router.get('/:spotId/bookings',
